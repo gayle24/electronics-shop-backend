@@ -1,6 +1,6 @@
 from setup import app, Resource, api, db
 from flask import make_response, jsonify, request
-from models import User, Admin, Product, Order
+from models import User, Admin, Product, Order, Cart
 from flask_cors import CORS
 
 @app.route('/')
@@ -141,6 +141,66 @@ class ProductsByID(Resource):
             return {"error": "Product not found"}
         
         db.session.delete(product)
+        db.session.commit()
+
+        return {"message": "Product deleted successfully"}, 204
+
+api.add_resource(ProductsByID, '/products/<int:id>')
+
+class Cart(Resource):
+    def get(self):
+        carts = Cart.query.all()
+        response_dict_list = []
+        for item in carts:
+            response_dict = item.to_dict()
+            response_dict_list.append(response_dict)
+
+        resp = make_response(
+            jsonify(response_dict_list), 
+            200
+        )
+        return resp
+     
+    def post(self):
+        product_data = request.get_json()
+        product_id = product_data.get('product_id')
+        user_id= product_data.get('user_id')
+
+        if not product_id or not user_id :
+            return {"error": "Missing product information"}, 400
+
+        new_product = Cart(
+            user_id=user_id,
+            product_id=product_id
+        )
+
+        db.session.add(new_product)
+        db.session.commit()
+
+        response_data = {"message": "Product added to Cart", "cart_id": new_product.id}
+        return response_data
+    
+class CartByID(Resource):
+    def get(self, id):
+        cart = Cart.query.filter_by(id=id).first()
+        if cart:
+            response_dict = cart.to_dict()
+            status_code = 200
+        else:
+          response_dict = {"error": "Film not found"}
+          status_code = 200
+        response = make_response(
+                jsonify(response_dict),
+                200
+            )
+        return response
+
+    def delete(self, id):
+        cart = Cart.query.filter_by(id=id).first()
+        if not cart:
+            return {"error": "Product not found"}
+        
+        db.session.delete(cart)
         db.session.commit()
 
         return {"message": "Product deleted successfully"}, 204

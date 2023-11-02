@@ -41,7 +41,7 @@ class Admin(db.Model, SerializerMixin):
 
 
 class User(db.Model):
-    __tablename__ = "user"    
+    __tablename__ = "users"    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=False, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
@@ -49,7 +49,9 @@ class User(db.Model):
     
     address = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    order = db.relationship('Order', backref='user', lazy=True)
+    orders = db.relationship('Order', backref='user', lazy=True)
+    cart = db.relationship('Cart', backref='user', lazy=True)
+
     _password_hash = db.Column(db.String, nullable=False)
     @hybrid_property
     def password_hash(self):
@@ -107,14 +109,31 @@ class Order(db.Model):
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     quantity = db.Column(db.Integer, nullable=False, default=1)
     review = db.Column(db.String(200))
 
     def __repr__(self):
-        return f"Cart('Product id:{self.product_id}','id: {self.id}','User id:{self.user_id}'')"
+        return f"Order('Product id:{self.product_id}','id: {self.id}','User id:{self.user_id}'')"
     
+class Cart(db.Model):
+    __tablename__ = 'cart'
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f"Newsletter subscriber('{self.email}', ID:'{self.user_id}')"
+
+class Newsletters(db.Model):
+    __tablename__ = 'newsletters'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return f"Newsletter subscriber('{self.email}', ID:'{self.user_id}')"
 
 # class Reviews(db.Model):
 #     __tablename__ = "reviews"
