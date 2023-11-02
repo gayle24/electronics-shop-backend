@@ -206,7 +206,7 @@ class CartByID(Resource):
 
         return {"message": "Product deleted successfully"}, 204
 
-api.add_resource(CartByID, '/products/<int:id>')
+api.add_resource(CartByID, '/cart/<int:id>')
 
 class Orders(Resource):
     def post(self):
