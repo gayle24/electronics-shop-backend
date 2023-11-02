@@ -262,7 +262,7 @@ class Newsletters(Resource):
 
         response_data = {"message": "New newsletter subscriber added", "newsletter_id": new_subscriber.id}
         return response_data
-        
+api.add_resource(Newsletters, '/newsletters')        
 
 class ClientAddressUpdate(Resource):
     def patch(self, id):
