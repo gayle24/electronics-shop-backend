@@ -89,6 +89,19 @@ class Product(db.Model):
 
     def __repr__(self):
         return f"Products('{self.name}', '{self.price}')"
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'price': self.price,
+            'description': self.description,
+            'category': self.category,
+            'brand': self.brand,
+            'image_url': self.image_url,
+            'quantity': self.quantity,
+            'admin_id': self.admin_id
+        }
 
 class Order(db.Model):
     __tablename__ = 'orders'
