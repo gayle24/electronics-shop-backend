@@ -1,11 +1,14 @@
 from setup import app, Resource, api, db
 from flask import make_response, jsonify, request
 from models import User, Admin, Product, Order
+from flask_cors import CORS
 
 @app.route('/')
 def index():
     return {"message": "electropulse backend page"}
 
+
+CORS(app, resources = {r"/usersignup": {"origins": "http://localhost:5173"}})
 class UserSignup(Resource):
     def post(self):
         userData = request.get_json()
@@ -26,6 +29,8 @@ class UserSignup(Resource):
         return response_data, 201
 api.add_resource(UserSignup, '/usersignup')
 
+
+CORS(app, resources = {r"/userlogin": {"origins": "http://localhost:5173"}})
 class Userlogin(Resource):
     def post(self):
         login_data = request.get_json()
@@ -246,4 +251,4 @@ api.add_resource(Adminlogin, '/adminlogin')
 
 
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+    app.run(port=5555, debug=True, host='0.0.0.0')
