@@ -1,6 +1,6 @@
 from setup import app, Resource, api, db
 from flask import make_response, jsonify, request
-from models import User, Admin, Product, Order, Cart
+from models import User, Admin, Product, Order, Cart, Newsletter
 from flask_cors import CORS
 
 @app.route('/')
@@ -179,6 +179,7 @@ class Cart(Resource):
 
         response_data = {"message": "Product added to Cart", "cart_id": new_product.id}
         return response_data
+api.add_resource(Cart, '/cart')
     
 class CartByID(Resource):
     def get(self, id):
@@ -205,7 +206,7 @@ class CartByID(Resource):
 
         return {"message": "Product deleted successfully"}, 204
 
-api.add_resource(ProductsByID, '/products/<int:id>')
+api.add_resource(CartByID, '/products/<int:id>')
 
 class Orders(Resource):
     def post(self):
@@ -241,6 +242,27 @@ class Orders(Resource):
         return response_data, 201
 
 api.add_resource(Orders, '/orders')
+
+class Newsletters(Resource):
+    def post(self):
+        product_data = request.get_json()
+        email = product_data.get('email')
+        user_id= product_data.get('user_id')
+
+        if not email or not user_id :
+            return {"error": "Missing product information"}, 400
+
+        new_subscriber = Newsletter(
+            user_id=user_id,
+            email=email
+        )
+
+        db.session.add(new_subscriber)
+        db.session.commit()
+
+        response_data = {"message": "New newsletter subscriber added", "newsletter_id": new_subscriber.id}
+        return response_data
+        
 
 class ClientAddressUpdate(Resource):
     def patch(self, id):

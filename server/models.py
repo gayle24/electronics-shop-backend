@@ -126,7 +126,7 @@ class Cart(db.Model):
     def __repr__(self):
         return f"Newsletter subscriber('{self.email}', ID:'{self.user_id}')"
 
-class Newsletters(db.Model):
+class Newsletter(db.Model):
     __tablename__ = 'newsletters'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String)
