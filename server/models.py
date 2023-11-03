@@ -49,8 +49,8 @@ class User(db.Model):
     
     address = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    orders = db.relationship('Order', backref='user', lazy=True)
-    cart = db.relationship('Cart', backref='user', lazy=True)
+    orders = db.relationship('Order', backref='users', lazy=True)
+    cart = db.relationship('Cart', backref='users', lazy=True)
 
     _password_hash = db.Column(db.String, nullable=False)
     @hybrid_property
@@ -121,7 +121,7 @@ class Cart(db.Model):
     __tablename__ = 'cart'
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def __repr__(self):
         return f"Newsletter subscriber('{self.email}', ID:'{self.user_id}')"
@@ -130,19 +130,10 @@ class Newsletter(db.Model):
     __tablename__ = 'newsletters'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __repr__(self):
         return f"Newsletter subscriber('{self.email}', ID:'{self.user_id}')"
 
-# class Reviews(db.Model):
-#     __tablename__ = "reviews"
-#     id = db.Column(db.Integer, primary_key=True)
-#     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-#     rating = db.Column(db.Integer, nullable=False)
-#     comment = db.Column(db.Text, nullable=False)
-
-#     def __repr__(self):
-#         return f"Reviews('{self.product_id}', '{self.user_id}', '{self.rating}')"    
+   
 
