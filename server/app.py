@@ -267,6 +267,7 @@ class Orders(Resource):
 
 api.add_resource(Orders, '/orders')
 
+CORS(app, resources={r"/newsletters": {"origins": "http://localhost:5173"}})
 
 class Newsletters(Resource):
     def post(self):
