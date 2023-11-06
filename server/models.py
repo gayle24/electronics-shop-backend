@@ -15,7 +15,7 @@ class Admin(db.Model, SerializerMixin):
     __tablename__ = "admin"    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=False, nullable=False)
-    email = db.Column(db.String, unique=True, nullable=False)
+    email = db.Column(db.String, unique=False, nullable=False)
     contact = db.Column(db.String)
     address = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
@@ -44,8 +44,8 @@ class User(db.Model):
     __tablename__ = "users"    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=False, nullable=False)
-    email = db.Column(db.String, unique=True, nullable=False)
-    contact = db.Column(db.String)
+    email = db.Column(db.String, unique=False, nullable=False)
+    contact = db.Column(db.String, unique=False)
     
     address = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
