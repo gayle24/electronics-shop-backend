@@ -3,7 +3,7 @@ from faker import Faker
 from datetime import datetime, timedelta
 from setup import db, app
 
-from models import User, Admin, Product
+from models import User, Admin
 
 
 fake=Faker()
