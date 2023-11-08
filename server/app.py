@@ -4,6 +4,21 @@ from flask import make_response, jsonify, request
 from models import User, Admin, Product, Order, Cart, Newsletter
 from flask_cors import CORS
 import sys
+from dotenv import load_dotenv
+load_dotenv()
+
+import os  # Import os here
+
+# ...
+
+flask_env = os.environ.get("FLASK_ENV")
+
+if flask_env == "production":
+    # Configure your app for production
+    app.config["DEBUG"] = False
+else:
+    # Configure your app for development
+    app.config["DEBUG"] = True
 
 @app.route('/')
 def index():

@@ -40,7 +40,7 @@ class Admin(db.Model, SerializerMixin):
     
 
 
-class User(db.Model):
+class User(db.Model, SerializerMixin):
     __tablename__ = "users"    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=False, nullable=False)
@@ -97,18 +97,18 @@ class Product(db.Model, SerializerMixin):
     def __repr__(self):
         return f"Products('{self.name.data}', '{self.price.data}')"
     
-    # def to_dict(self):
-    #     return {
-    #         'id': self.id,
-    #         'name': self.name,
-    #         'price': self.price,
-    #         'description': self.description,
-    #         'category': self.category,
-    #         'brand': self.brand,
-    #         'image_url': self.image_url,
-    #         'quantity': self.quantity,
-    #         'admin_id': self.admin_id
-    #     }
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'price': self.price,
+            'description': self.description,
+            'category': self.category,
+            'brand': self.brand,
+            'image_url': self.image_url,
+            'quantity': self.quantity,
+            'admin_id': self.admin_id
+        }
 
 class Order(db.Model, SerializerMixin):
     __tablename__ = 'orders'
@@ -124,14 +124,14 @@ class Order(db.Model, SerializerMixin):
     def __repr__(self):
         return f"Order('Product id:{self.product_id}','id: {self.id}','User id:{self.user_id}')"
     
-class Cart(db.Model):
+class Cart(db.Model, SerializerMixin):
     __tablename__ = 'cart'
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
 
-class Newsletter(db.Model):
+class Newsletter(db.Model, SerializerMixin):
     __tablename__ = 'newsletters'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String)
@@ -141,7 +141,7 @@ class Newsletter(db.Model):
         return f"Newsletter subscriber('{self.email}', ID:'{self.user_id}')"
 
    
-class Sales(db.Model):
+class Sales(db.Model, SerializerMixin):
     __tablename__ = 'sales'
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
