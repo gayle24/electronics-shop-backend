@@ -73,11 +73,11 @@ class User(db.Model):
         flash('Your order has been made succesfully!', 'success')
 
     def __repr__(self):
-        return f"User('{self.firstname}','{self.lastname}', '{self.email}','{self.id}')"
+        return f"User('{self.name}', '{self.email}','{self.id}')"
 
 
 
-class Product(db.Model):
+class Product(db.Model, SerializerMixin):
     __tablename__ = "products"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
@@ -88,34 +88,41 @@ class Product(db.Model):
     image_url = db.Column(db.String, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'))
-
-    def __repr__(self):
-        return f"Products('{self.name}', '{self.price}')"
     
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'price': self.price,
-            'description': self.description,
-            'category': self.category,
-            'brand': self.brand,
-            'image_url': self.image_url,
-            'quantity': self.quantity,
-            'admin_id': self.admin_id
-        }
+    orders = db.relationship('Order', back_populates='products')
+    serialize_rules = ('-orders.products',)
+    sales = db.relationship('Sales', back_populates='products')
+    serialize_rules = ('-sales.products',)
+    
+    def __repr__(self):
+        return f"Products('{self.name.data}', '{self.price.data}')"
+    
+    # def to_dict(self):
+    #     return {
+    #         'id': self.id,
+    #         'name': self.name,
+    #         'price': self.price,
+    #         'description': self.description,
+    #         'category': self.category,
+    #         'brand': self.brand,
+    #         'image_url': self.image_url,
+    #         'quantity': self.quantity,
+    #         'admin_id': self.admin_id
+    #     }
 
-class Order(db.Model):
+class Order(db.Model, SerializerMixin):
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-
     quantity = db.Column(db.Integer, nullable=False, default=1)
     review = db.Column(db.String(200))
 
+    products = db.relationship('Product', back_populates='orders')
+    serialize_rules = ('-products.orders',)
+
     def __repr__(self):
-        return f"Order('Product id:{self.product_id}','id: {self.id}','User id:{self.user_id}'')"
+        return f"Order('Product id:{self.product_id}','id: {self.id}','User id:{self.user_id}')"
     
 class Cart(db.Model):
     __tablename__ = 'cart'
@@ -123,8 +130,6 @@ class Cart(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    def __repr__(self):
-        return f"Newsletter subscriber('{self.email}', ID:'{self.user_id}')"
 
 class Newsletter(db.Model):
     __tablename__ = 'newsletters'
@@ -136,4 +141,13 @@ class Newsletter(db.Model):
         return f"Newsletter subscriber('{self.email}', ID:'{self.user_id}')"
 
    
+class Sales(db.Model):
+    __tablename__ = 'sales'
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    # quantity = db.Column(db.Integer)
+    total_sales = db.Column(db.Integer)
+    date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
+    products = db.relationship('Product', back_populates='sales')
+    serialize_rules = ('-products.sales',)

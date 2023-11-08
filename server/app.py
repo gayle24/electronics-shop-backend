@@ -1,7 +1,9 @@
+
 from setup import app, Resource, api, db
 from flask import make_response, jsonify, request
 from models import User, Admin, Product, Order, Cart, Newsletter
 from flask_cors import CORS
+import sys
 
 @app.route('/')
 def index():
@@ -57,6 +59,7 @@ api.add_resource(Userlogin, '/userlogin')
 
 class Products(Resource):
     def get(self):
+        print(sys.getrecursionlimit())
         products = Product.query.all()
         response_dict_list = []
         for item in products:
