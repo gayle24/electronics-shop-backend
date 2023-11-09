@@ -4,8 +4,8 @@ from flask import make_response, jsonify, request
 from models import User, Admin, Product, Order, Cart, Newsletter
 from flask_cors import CORS
 import sys
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 
 import os  # Import os here
 
