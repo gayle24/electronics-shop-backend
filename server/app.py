@@ -1,7 +1,7 @@
 
 from setup import app, Resource, api, db
 from flask import make_response, jsonify, request
-from models import User, Admin, Product, Order, Cart, Newsletter
+from models import User, Admin, Product, Order, Cart, Newsletter, Sales
 from flask_cors import CORS
 import sys
 # from dotenv import load_dotenv
@@ -280,7 +280,57 @@ class Newsletters(Resource):
 
         response_data = {"message": "New newsletter subscriber added", "newsletter_id": new_subscriber.id}
         return response_data
-api.add_resource(Newsletters, '/newsletters')        
+api.add_resource(Newsletters, '/newsletters') 
+
+class SalesResource(Resource):
+    def get(self):
+        # Retrieve product IDs and total sales
+        sales_data = Sales.query.with_entities(Sales.product_id, db.func.sum(Sales.total_sales).label('total_sales')).group_by(Sales.product_id).all()
+        
+        # Fetch product names and admin IDs using product IDs
+        product_info = []
+        for product_id, total_sales in sales_data:
+            product = Product.query.get(product_id)
+            if product:
+                product_info.append({
+                    'product_id': product_id,
+                    'product_name': product.name,
+                    'admin_id': product.admin_id,
+                    'total_sales': total_sales
+                })
+
+        return product_info
+    
+    def post(self):
+        sale_data = request.get_json()
+        product_id = sale_data.get('product_id')
+        sale_date = sale_data.get('date')
+        sales_amount = sale_data.get('total_sales')
+
+        if not product_id or not sale_date or not sales_amount:
+            return {"error": "Missing sale information"}, 400
+
+        # Check if there's an existing sale for the same product and month/year
+        existing_sale = Sales.query.filter(
+            Sales.product_id == product_id,
+            Sales.date.month == sale_date.month,
+            Sales.date.year == sale_date.year
+        ).first()
+
+        if existing_sale:
+            existing_sale.total_sales += sales_amount
+            db.session.commit()
+            response_data = {'message': 'Sale updated successfully'}
+        else:
+            # Create a new sale
+            new_sale = Sales(product_id=product_id, sales=sales_amount, date=sale_date)
+            db.session.add(new_sale)
+            db.session.commit()
+            response_data = {'message': 'Sale created successfully'}
+
+        return response_data, 201
+
+api.add_resource(SalesResource, '/sales')
 
 class ClientAddressUpdate(Resource):
     def patch(self, id):
