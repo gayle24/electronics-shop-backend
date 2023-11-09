@@ -72,6 +72,67 @@ class Userlogin(Resource):
         return response_data
 api.add_resource(Userlogin, '/userlogin')
 
+class GetUsers(Resource):
+    def get(self):
+        users = User.query.all()
+        resp_dict_list=[]
+        for item in users:
+            resp_dict = item.to_dict()
+            resp_dict_list.append(resp_dict)
+            resp = make_response(
+                jsonify(resp_dict_list),
+                200
+            )
+
+            return resp
+api.add_resource(GetUsers, '/users')
+
+class UsersByID(Resource):
+    def get(self, id):
+        user = User.query.filter_by(id=id).first()
+        if user:
+            resp_dict = user.to_dict()
+            status_code=200
+        else:
+            resp_dict = {"message": "User not found"}
+            status_code = 404
+
+        resp = make_response(
+            jsonify(resp_dict),
+            status_code
+        )
+
+        return resp
+    
+    def patch(self, id):
+        user = User.query.filter_by(id=id).first()
+        if not user:
+            return {"error": "User not found"}
+        data = request.get_json()
+
+        if 'role' in data:
+            try:
+                user.role = str(data['role'])
+                db.session.commit()
+                return user.to_dict(), 200
+            except ValueError:
+                return {"error": "Invalid 'role' value"}, 400
+        else:
+            return {"error": "Missing 'role' in request data"}, 400
+
+    def delete(self, id):
+        user=User.query.filter_by(id=id).first()
+        if not user:
+            return {"error": "User not found"}
+        
+        db.session.delete(user)
+        db.session.commit()
+
+        return{"message": "User deleted successfully"}, 204
+    
+api.add_resource(UsersByID, '/users/<int:id>')
+
+
 class Products(Resource):
     def get(self):
         print(sys.getrecursionlimit())
@@ -86,6 +147,7 @@ class Products(Resource):
             200
         )
         return resp
+    
     
     def post(self):
         product_data = request.get_json()

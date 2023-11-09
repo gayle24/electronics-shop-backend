@@ -46,7 +46,7 @@ class User(db.Model, SerializerMixin):
     name = db.Column(db.String, unique=False, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     contact = db.Column(db.String)
-    
+    role = db.Column(db.String)
     address = db.Column(db.String, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     orders = db.relationship('Order', backref='users', lazy=True)

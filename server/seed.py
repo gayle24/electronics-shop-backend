@@ -10,7 +10,7 @@ fake=Faker()
 
 with app.app_context():
 
-    db.session.query(Admin).delete()
+
     db.session.query(User).delete()
     db.session.commit()
 
